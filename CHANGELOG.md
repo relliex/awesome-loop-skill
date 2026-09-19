@@ -29,16 +29,17 @@ v3.1 管住生产者在工件里留后门、验证者放水、调度者默许残
 
 - skill 本体移入 [`skills/true-loop-skill/`](skills/true-loop-skill/)：
   SKILL.md + references/（岗位生成教学案例、状态格式、软件域附录）；
-- v1 原稿从 references/ 移至 docs/（归入设计历史，不再与现行 skill
-  混放）；
+- v1 原稿从 references/ 移至 docs/（28 个角色的完整定义仍具参考价值，
+  归入设计历史与角色素材，不再与现行 skill 混放）；
+- v3 升级的需求文档与对抗验证报告属于内部过程产物，移出仓库
+  （仍可从 git 历史查看）；
 - 双语 README 首行增加语言切换链接，重写"仓库结构"并给出新布局下的
   复制式安装命令（bash / PowerShell）；
 - 新增本文件。
 
 ## v3.0 (2026-09-17)
 
-域无关重构（详见 docs/upgrade-to-v3-requirements.md 与
-docs/adversarial-review-v3.md）：
+域无关重构：
 
 - 不再以固定岗位表为主干：改为**岗位生成法**（三种原型 × 生成八步 ×
   生成后自检）+ 8 个领域的教学案例（软件、长文写作、研究调查、设计、

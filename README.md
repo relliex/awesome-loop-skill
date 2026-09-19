@@ -198,10 +198,10 @@ skills/true-loop-skill/            ← the skill itself (what agents load)
   references/role-design.md        role-generation method + 8 domain cases
   references/state-format.md       full .loop/ state, team.md, handoff formats
   references/role-catalog.md       software-domain appendix: 28 classic roles
-docs/                              repo-level documentation & design history
-  upgrade-to-v3-requirements.md    requirements doc driving the v3 redesign
-  adversarial-review-v3.md         independent adversarial review of v3
-  v1-original.md                   the legacy v1 skill — kept as history
+docs/
+  v1-original.md                   legacy v1 skill — full definitions of the
+                                   28 roles, kept as design history & role
+                                   material for large software projects
 README.md / README_cn.md           this file / 中文说明
 CHANGELOG.md                       version history
 LICENSE                            MIT

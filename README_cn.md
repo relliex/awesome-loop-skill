@@ -169,10 +169,9 @@ skills/true-loop-skill/            ← skill 本体（由代理加载）
   references/role-design.md        岗位生成法 + 8 个领域教学案例
   references/state-format.md       .loop/ 状态、team.md、任务包完整格式
   references/role-catalog.md       软件域附录：28 个经典岗位的映射
-docs/                              仓库级文档与设计历史
-  upgrade-to-v3-requirements.md    v3 升级的需求文档（驱动了本次重构）
-  adversarial-review-v3.md         v3 的独立对抗验证报告
-  v1-original.md                   v1 原稿——作为设计历史保留
+docs/
+  v1-original.md                   v1 原稿——28 个角色的完整定义，作为设计
+                                   历史与大型软件项目的角色素材保留
 README.md / README_cn.md           英文版 / 本文件
 CHANGELOG.md                       版本历史
 LICENSE                            MIT
