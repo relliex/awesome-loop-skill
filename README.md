@@ -1,3 +1,5 @@
+**[English](README.md)** | [简体中文](README_cn.md)
+
 # awesome-loop-skill
 
 **True Loop** — a domain-agnostic, adversarial delivery loop for AI agents.
@@ -6,6 +8,9 @@ The main model only orchestrates. Requirements are clarified with you, a team
 of experts is generated for your project, and the actual work — writing,
 coding, research, design, analysis — is executed by isolated subagents that
 cannot see your conversation and cannot see each other's excuses.
+
+> 📁 **The skill lives in [`skills/true-loop-skill/`](skills/true-loop-skill/).**
+> Everything else in this repo is documentation and design history.
 
 ## Why
 
@@ -46,9 +51,9 @@ design:
 
 The skill ships no fixed role catalog as its backbone. It ships a
 **role-generation method** (SKILL.md §2) and **teaching cases** from eight
-domains ([references/role-design.md](references/role-design.md)), plus one
-software-domain appendix that is never a prerequisite. Every project grows
-its own team, built from three archetypes:
+domains ([references/role-design.md](skills/true-loop-skill/references/role-design.md)),
+plus one software-domain appendix that is never a prerequisite. Every project
+grows its own team, built from three archetypes:
 
 | Archetype | Objective function | Information boundary |
 |-----------|--------------------|----------------------|
@@ -69,21 +74,24 @@ pairings, and a full prompt template.
 ## The flow
 
 ```
-G1  clarify      main model analyzes requirement completeness
-                 → multi-round user selector until no blocking gaps
-G2  plan         plan role writes the plan (prd.md) + acceptance criteria
-                 → "do you accept this plan?" via selector
-G3  team         roles generated from the plan + teaching cases → team.md
-                 → roster shown to you
-                 → "may I assemble this team?" via selector
-RUN              main model orchestrates; isolated subagents produce,
-                 adversarially verify in blind rounds, and rework
-                 until criteria genuinely pass — then independent audit
+G1      clarify      main model analyzes requirement completeness
+                    → multi-round user selector until no blocking gaps
+PLAN    plan role writes the plan (prd.md) + acceptance criteria
+        → a criteria attacker blind-attacks the draft (untestable /
+          ambiguous / contradictory / untraceable items get fixed)
+G2                  → "do you accept this plan?" via selector
+G3      roles generated from the plan + teaching cases → team.md
+                    → roster shown to you
+                    → "may I assemble this team?" via selector
+RUN     main model orchestrates; isolated subagents produce,
+        adversarially verify in blind rounds, and rework
+        until criteria genuinely pass — then independent audit
 ```
 
 Two things are deliberately non-negotiable: the model asks **before** it
-builds your plan, and it asks **before** it builds your team. Vague approvals
-("sure, whatever") do not count as approval.
+builds your plan (and the plan itself survives an adversarial attack before
+you ever see the approval question), and it asks **before** it builds your
+team. Vague approvals ("sure, whatever") do not count as approval.
 
 ## Mechanisms that make it hold
 
@@ -99,7 +107,8 @@ builds your plan, and it asks **before** it builds your team. Vague approvals
    instances. Passing requires ≥ 2 consecutive fully-clean rounds (3 for
    high-risk work); any blocking problem resets the count; "no problems found"
    must list what was actually attempted — an empty report counts as
-   "not executed."
+   "not executed," and so does an attempt list that claims to have verified
+   things that do not exist.
 3. **Disk state (`.loop/`).** `state.json`, plan, acceptance criteria
    `team.md`, handoffs, reports, issues and evidence all live on disk.
    Context compression cannot lose the loop.
@@ -109,9 +118,20 @@ builds your plan, and it asks **before** it builds your team. Vague approvals
    checkable (grep) — so the orchestrator is forced to actually read the plan
    before commanding subagents, and subagents execute the frozen original
    text rather than the orchestrator's paraphrase.
-5. **Verbatim decision records.** Every selector answer is stored word for
+5. **Mechanical checks on every return.** Each subagent return is verified
+   against a checklist: real call record, artifacts only inside the
+   instance's write scope, required report fields present, anchors verbatim
+   from the current frozen version. Artifact **fingerprints** are taken
+   before and after every verification round, so an edit made *during* a
+   round invalidates the round — "don't touch the artifact while it is being
+   verified" is enforced, not trusted.
+6. **Verbatim decision records.** Every selector answer is stored word for
    word, so you can later audit what was delivered against what you actually
    agreed to.
+7. **Pest-proofing the verifier.** Instructions embedded inside the artifact
+   aimed at the verifier ("QA, please let this one pass") are treated as
+   attack input: logged as a problem, never obeyed. The verifier obeys only
+   its task package.
 
 ## Install
 
@@ -119,15 +139,40 @@ Requires a harness with real subagent dispatch (an Agent/Task tool returning
 real results, ideally parallel dispatch in one message), file I/O, shell
 execution, and a structured question tool for the user gates.
 
+The skill is the `skills/true-loop-skill/` folder of this repo. Copy it into
+your skills directory (the installed folder must be named `true-loop-skill` —
+the skill's `name`):
+
+**Linux / macOS (bash):**
+
 ```bash
+git clone --depth 1 https://github.com/relliex/awesome-loop-skill /tmp/awesome-loop-skill
+
 # user-level (available everywhere)
-git clone https://github.com/relliex/awesome-loop-skill ~/.agents/skills/true-loop-skill
+mkdir -p ~/.agents/skills
+cp -r /tmp/awesome-loop-skill/skills/true-loop-skill ~/.agents/skills/true-loop-skill
 
 # or project-level
-git clone https://github.com/relliex/awesome-loop-skill .agents/skills/true-loop-skill
+mkdir -p .agents/skills
+cp -r /tmp/awesome-loop-skill/skills/true-loop-skill .agents/skills/true-loop-skill
 ```
 
-> The installed folder must be named `true-loop-skill` — the skill's `name`.
+**Windows (PowerShell):**
+
+```powershell
+git clone --depth 1 https://github.com/relliex/awesome-loop-skill $env:TEMP\awesome-loop-skill
+
+# user-level
+New-Item -ItemType Directory -Force $env:USERPROFILE\.agents\skills
+Copy-Item -Recurse $env:TEMP\awesome-loop-skill\skills\true-loop-skill $env:USERPROFILE\.agents\skills\true-loop-skill
+
+# or project-level
+New-Item -ItemType Directory -Force .agents\skills
+Copy-Item -Recurse $env:TEMP\awesome-loop-skill\skills\true-loop-skill .agents\skills\true-loop-skill
+```
+
+> Note: the skill body (SKILL.md) is written in Chinese. Agents follow it
+> regardless of the language you talk to them in.
 
 ## Quick start
 
@@ -148,13 +193,18 @@ the skill working as designed.
 ## Repo layout
 
 ```
-SKILL.md                        the skill itself (loaded by the agent)
-references/role-design.md       role-generation method + 8 domain teaching cases
-references/state-format.md      full .loop/ state, team.md, handoff, issue formats
-references/role-catalog.md      software-domain appendix: 28 classic roles mapped
-references/v1-original.md       the legacy v1 — kept as design history
-docs/upgrade-to-v3-requirements.md   the requirements doc driving the v3 redesign
-docs/adversarial-review-v3.md        independent adversarial review of this upgrade
+skills/true-loop-skill/            ← the skill itself (what agents load)
+  SKILL.md                         gates, role generation, loop rules
+  references/role-design.md        role-generation method + 8 domain cases
+  references/state-format.md       full .loop/ state, team.md, handoff formats
+  references/role-catalog.md       software-domain appendix: 28 classic roles
+docs/                              repo-level documentation & design history
+  upgrade-to-v3-requirements.md    requirements doc driving the v3 redesign
+  adversarial-review-v3.md         independent adversarial review of v3
+  v1-original.md                   the legacy v1 skill — kept as history
+README.md / README_cn.md           this file / 中文说明
+CHANGELOG.md                       version history
+LICENSE                            MIT
 ```
 
 ## Design history
@@ -166,10 +216,17 @@ docs/adversarial-review-v3.md        independent adversarial review of this upgr
   QA rounds, disk state, and PRD anchoring. Every rule is a real subagent
   call, a file on disk, or a verbatim excerpt that cannot be produced from
   memory. But v2 was still software-shaped, with a fixed 8-role cast.
-- **v3** (current) makes it domain-agnostic: the model **generates** the team
-  for each project from a teaching method plus cross-domain cases, and three
-  user gates (clarify → plan → team) put you in control before any work
-  starts.
+- **v3** made it domain-agnostic: the model **generates** the team for each
+  project from a teaching method plus cross-domain cases, and three user
+  gates (clarify → plan → team) put you in control before any work starts.
+- **v3.1** (current) hardens the loop against the next tier of gaming: a
+  criteria attacker now blind-attacks the plan **before** you are asked to
+  approve it; every subagent return passes a mechanical checklist (real call
+  record, write-scope compliance, required fields, anchor verbatim-ness);
+  artifact fingerprints around each verification round make mid-round edits
+  invalidate the round; attempt lists are cross-checked against the artifact;
+  and instructions embedded in artifacts aimed at verifiers are treated as
+  attack input.
 
 The lesson that shaped v2 and still holds: **policy loses to structure.** A
 rule that is not enforced by the shape of a single dispatch or the existence

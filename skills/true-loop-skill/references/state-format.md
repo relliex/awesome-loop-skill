@@ -13,6 +13,7 @@
   "consecutive_clean": 1,
   "candidate_id": "cand-003",
   "candidate_base": "git a1b2c3d 或目录快照说明",
+  "candidate_fingerprint": ".loop/evidence/cand-003.fingerprints.md",
   "attack_surfaces": ["功能与用户路径", "边界与异常", "集成与数据"],
   "required_clean_rounds": 2,
   "gates": {
@@ -91,11 +92,12 @@ G3 批准后冻结，版本化。每个角色都有独立产物与判据，禁�
 
 ## 派发顺序与依赖
 
-1. PM-1 →（冻结）→ QA-1 攻击判据 →（修复判据）→ G2
-2. DEV-1 ∥ DEV-2（写范围互不重叠）
-3. QA-2（并行攻击面：功能 / 边界 / 集成）
-4. 问题返工：DEV → QA-2 复核 → 候选重建 → 重开轮次
-5. DOC-1 → QA-3 → AUD-1
+0. （P1 已完成）PM-1 冻结判据前，QA-1 已盲攻击 prd/acceptance 草案
+   并由 PM-1 修复——这是 G2 的前置（SKILL.md §5 B4）
+1. DEV-1 ∥ DEV-2（写范围互不重叠）
+2. QA-2（并行攻击面：功能 / 边界 / 集成）
+3. 问题返工：DEV → QA-2 复核 → 候选重建 → 重开轮次
+4. DOC-1 → QA-3 → AUD-1
 ```
 
 ## 挂起（PARKED）语义
@@ -122,6 +124,9 @@ G3 批准后冻结，版本化。每个角色都有独立产物与判据，禁�
 ## 候选与版本规则
 
 - candidate_id 在工件发生任何改动后递增（cand-004…），旧证据失效；
+- 工件指纹清单（路径 + 哈希，或大小与修改时间）在每轮验证派发前刷新
+  并落盘 evidence/，该轮全部返回后复核；不符即新候选（SKILL.md §7
+  工件指纹），`candidate_fingerprint` 记录当前指向；
 - prd.md / acceptance.md / team.md（以及启用的 design/design.md）带版本
   号与日期页眉；冻结后只读；
 - 变更流程：用户请求**先原话落盘 user-decisions.md** → 回方案/编排角色
