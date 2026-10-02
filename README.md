@@ -2,6 +2,16 @@
 
 # awesome-loop-skill
 
+> [!WARNING]
+> ### ⚠️ Experimental Exploration · Active WIP (Not a Finished Product)
+>
+> Thank you to the community for testing and providing valuable feedback! Regarding frequent observations that **"the loop takes too long to run"** and **"quality improvements in certain tasks feel modest or have low marginal returns"**, please note:
+>
+> 1. **Not a Polished Production Product**: This project is currently an **experimental proof-of-concept and paradigm exploration (WIP)**. Subagent coordination dynamics, convergence velocity, and game-theoretic balance are undergoing active iteration. It is not an out-of-the-box turnkey solution.
+> 2. **Why Latency and Compute Overhead Are High**: True Loop strictly enforces blind multi-round adversarial testing, isolated subagent execution, verbatim requirement anchoring, and mechanical disk verification. Preventing models from grading their own homework and quietly lowering standards requires genuine multi-turn dispatches, retries, and independent reviews, resulting in **substantially longer loop durations and high token/dispatch consumption**.
+> 3. **Task Suitability & Perceived Improvement**: For straightforward, linear, or deterministic tasks where single-pass models already perform adequately, the **incremental quality gains may feel modest relative to the time and compute spent**. The architecture's value lies primarily in high-stakes, long-horizon tasks prone to hallucination, compromise, and where hard verification evidence is non-negotiable.
+> 4. **Usage Recommendation**: Always specify an explicit **dispatch budget cap** (e.g., `Budget: 20 dispatches`) and treat this as an experimental research harness. Real-world feedback, benchmarks, and PRs are warmly welcomed in Issues!
+
 **True Loop** — a domain-agnostic, adversarial delivery loop for AI agents.
 
 The main model only orchestrates. Requirements are clarified with you, a team
