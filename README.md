@@ -113,12 +113,14 @@ team. Vague approvals ("sure, whatever") do not count as approval.
    fallback exists only with your explicit consent; it is labeled
    "unverified" and "self-assessment risk", ships per-criterion steps you can
    re-run yourself, and is barred for high-risk work.)
-2. **Blind adversarial rounds.** Verification runs in rounds with fresh
-   instances. Passing requires ≥ 2 consecutive fully-clean rounds (3 for
-   high-risk work); any blocking problem resets the count; "no problems found"
-   must list what was actually attempted — an empty report counts as
-   "not executed," and so does an attempt list that claims to have verified
-   things that do not exist.
+2. **Blind adversarial rounds — with a convergence rule.** Verification runs
+   in rounds with fresh instances. Passing requires ≥ 2 consecutive rounds
+   with **no blocking findings** (3 for high-risk work); any blocking problem
+   resets the count; "no problems found" must list what was actually
+   attempted — an empty report counts as "not executed," and so does an
+   attempt list that claims to have verified things that do not exist.
+   Trivia does **not** reset the count or reopen rounds — adversarial effort
+   exists to buy confidence, not to burn tokens (see #8).
 3. **Disk state (`.loop/`).** `state.json`, plan, acceptance criteria
    `team.md`, handoffs, reports, issues and evidence all live on disk.
    Context compression cannot lose the loop.
@@ -142,6 +144,21 @@ team. Vague approvals ("sure, whatever") do not count as approval.
    aimed at the verifier ("QA, please let this one pass") are treated as
    attack input: logged as a problem, never obeyed. The verifier obeys only
    its task package.
+8. **The orchestrator commands — and knows when to stop.** The main model is
+   a manager, not a relay: it triages every verifier finding as *blocking*
+   (violates a frozen criterion, breaks real use → reopens the loop) or
+   *trivia* (logged as deferred, reported to you, never triggers new rounds),
+   with the triage reason on disk for the auditor to spot-check — and you can
+   overrule any triage. Patch-style fixes that merely make the failing check
+   pass are rejected and redone with a root-cause requirement. A verifier
+   that keeps re-registering triaged trivia or attacking out-of-scope areas
+   is retired and replaced with a narrowed task package. Two consecutive
+   rounds with only trivia converge the loop to audit, and per-role spend
+   tracking keeps verification from silently eating the budget. Task
+   packages stay minimal, but may carry 1–3 sentences of **purpose** (why
+   the artifact matters, how it is really used) — knowing the stakes
+   improves judgment; producer self-assessments and peer reports still
+   never cross the wall.
 
 ## Install
 
@@ -229,7 +246,7 @@ LICENSE                            MIT
 - **v3** made it domain-agnostic: the model **generates** the team for each
   project from a teaching method plus cross-domain cases, and three user
   gates (clarify → plan → team) put you in control before any work starts.
-- **v3.1** (current) hardens the loop against the next tier of gaming: a
+- **v3.1** hardens the loop against the next tier of gaming: a
   criteria attacker now blind-attacks the plan **before** you are asked to
   approve it; every subagent return passes a mechanical checklist (real call
   record, write-scope compliance, required fields, anchor verbatim-ness);
@@ -237,6 +254,13 @@ LICENSE                            MIT
   invalidate the round; attempt lists are cross-checked against the artifact;
   and instructions embedded in artifacts aimed at verifiers are treated as
   attack input.
+- **v3.2** (current) answers the cost complaint: **adversary serves
+  delivery, not token burning.** The main model gains command authority —
+  substantive triage of every finding (only blocking findings reset the
+  count), rejection of patch-style fixes, retirement of nitpicking verifiers,
+  and convergence rules (trivia-only rounds stop the loop; per-role spend
+  accounting). Task packages may now carry a 1–3 sentence statement of
+  purpose, while the blind-testing firewall stays shut.
 
 The lesson that shaped v2 and still holds: **policy loses to structure.** A
 rule that is not enforced by the shape of a single dispatch or the existence

@@ -35,7 +35,9 @@
     "dispatch_total": 80,
     "dispatch_used": 41,
     "fix_attempts_per_issue": 2,
-    "round_limit": 6
+    "reverify_per_issue": 2,
+    "round_limit": 6,
+    "by_role": {"QA-2": 18, "DEV-1": 12, "DEV-2": 9, "AUD-1": 4}
   },
   "gate_p0": {
     "checked_at": "2026-09-17",
@@ -57,8 +59,10 @@
 
 判定词表：对抗验证结论只有两个取值——`CLEAN`（未发现问题，必须附尝试
 清单）与 `FOUND`（发现问题，必须附最小复现/证据）；`history[].verdict`
-使用同一词表。连续通过计数（`consecutive_clean`）只统计全攻击面 `CLEAN`
-的轮次。
+使用同一词表。连续通过计数（`consecutive_clean`）只统计**无阻断**的
+轮次（`CLEAN`，或仅发现已分诊为琐项并登记 deferred 的轮次，SKILL.md
+§5 实质审查）；阻断问题清零。分诊与指挥权行使（分诊理由、退回、停派、
+收敛）在 state.json 留痕（如 `commands: [...]`），审计者抽查。
 
 与报告头 `status` 的关系：`status`（PASS / FAIL / BLOCKED）描述实例的
 执行状态，`CLEAN` / `FOUND` 描述对抗验证的结论，两者独立——`status:
@@ -184,6 +188,7 @@ inputs:
   - .loop/requirements/acceptance.md
   - .loop/runbook.md
 business_context: 本节所需最小背景，不含其他角色的结论
+purpose_context: 服务于 PRD-3（可靠持久化）；真实场景是用户随时强杀进程
 write_scope:
   - .loop/reports/verify/round2-edge.md
   - .loop/evidence/verify/round2-edge/
@@ -204,7 +209,8 @@ budget: {time_minutes: 20, tool_calls: 60}
 ```markdown
 # ISSUE-001
 - 发现: round 1 / QA-2 功能面 (T-D-VERIFY-R1-func)
-- 严重度: 高 / 阻断: 是
+- 严重度: 高
+- 分诊: blocking（违反 AC-05，影响真实持久化）
 - 关联: AC-05（持久化）
 - 最小复现/证据: 执行 X 后立即 Y，期望 <a>，实际 <b>（证据: evidence/…）
 - 责任角色: DEV-2
@@ -223,7 +229,8 @@ budget: {time_minutes: 20, tool_calls: 60}
 - **生产者**：产物清单；自检方法与真实输出；未尽事项；
   unresolved_questions。
 - **对抗验证者**：尝试过的验证与攻击清单；逐条判据实测结果；问题列表
-  （最小复现/证据）；结论 `CLEAN`（附尝试证据）或 `FOUND`（附复现）。
+  （每条注明违反哪条判据、影响哪个使用场景；琐项单列）；结论 `CLEAN`
+  （附尝试证据）或 `FOUND`（附复现）。
 - **审计者**：需求→工件→证据 追踪表（双向）；断裂点；结论。
 
 ## 证据绑定
